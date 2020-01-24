@@ -1,8 +1,15 @@
-const Joi = require("joi");
-const express = require("express");
+import { string, validate } from "joi";
+import logger from "./logger";
+import authenticater from "./authenticater";
+import express, { json, urlencoded, static } from "express";
 const app = express();
 
-app.use(express.json());
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(static("public")); // serve static content
+
+app.use(logger);
+app.use(authenticater);
 
 const courses = [
   { id: 1, name: "course1" },
@@ -82,11 +89,11 @@ app.delete("/api/courses/:id", (req, res) => {
 
 function validateCourse(course) {
   const schema = {
-    name: Joi.string()
+    name: string()
       .min(3)
       .required()
   };
-  return Joi.validate(course, schema);
+  return validate(course, schema);
 }
 
 // PORT
